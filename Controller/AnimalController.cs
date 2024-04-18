@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using Task6.Model;
 
 
 namespace Task6.Controller;
@@ -40,5 +41,32 @@ public class AnimalController : ControllerBase
             };
             return Ok(animal); 
         }
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Animal>>> GetAnimals([FromQuery] string orderBy = "name")
+    {
+        IQueryable<Animal> query = _configuration.Animal;
+
+        switch (orderBy.ToLower())
+        {
+            case "name":
+                query = query.OrderBy(a => a.Name);
+                break;
+            case "description":
+                query = query.OrderBy(a => a.Description);
+                break;
+            case "category":
+                query = query.OrderBy(a => a.Category);
+                break;
+            case "area":
+                query = query.OrderBy(a => a.Area);
+                break;
+            default:
+                query = query.OrderBy(a => a.Name);
+                break;
+        }
+
+        return await query.ToListAsync();
     }
 }
